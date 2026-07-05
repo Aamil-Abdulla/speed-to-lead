@@ -1,0 +1,455 @@
+{
+  "name": "Lead Capture Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        16
+      ],
+      "id": "163e46ee-398d-4ba2-ac0a-13374facdc59",
+      "name": "Webhook",
+      "webhookId": "5f99aca5-226d-4352-8c03-26cfd65f56b3"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1GMBqn8HmhCjgEvsVW5GNlI_c5PUlvBkOamw9vRkG7S0",
+          "mode": "list",
+          "cachedResultName": "Leads Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GMBqn8HmhCjgEvsVW5GNlI_c5PUlvBkOamw9vRkG7S0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GMBqn8HmhCjgEvsVW5GNlI_c5PUlvBkOamw9vRkG7S0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$now}}",
+            "Name": "={{$json.body.name}}",
+            "Email": "={{ $json.body.email }}",
+            "Phone": "={{ $json.body.phone }}",
+            "Message": "={{ $json.body.message }}",
+            "Source": "website"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        256
+      ],
+      "id": "38a79867-2c58-4eec-94e9-a46b8d131459",
+      "name": "Append row in sheet",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "a1ISA2SIhOGfYi4S",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#all-lead-bot",
+          "mode": "name"
+        },
+        "text": "=🔥 HOT LEAD: {{ $json.one_line_reason }}\nBudget: {{ $json.budget }} | Area: {{ $json.preferred_area }}\nName: {{ $json.name }} | Phone: {{ $json.phone }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        592,
+        16
+      ],
+      "id": "94637ca1-71e2-4051-a158-eb7c5c4845cc",
+      "name": "Send a message",
+      "webhookId": "68bcb075-22d9-482e-a1a3-334ca640423b",
+      "retryOnFail": true,
+      "credentials": {
+        "slackApi": {
+          "id": "LRosL6VijH4OUQep",
+          "name": "Slack account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Thank You for Reaching Out {{ $json.name }}",
+        "message": "=Hi {{ $json.name }},<br><br>\nThanks for reaching out! We received your message: \"{{ $json.raw_message }}\"<br><br>\nOur team will get back to you shortly.<br><br>\nBest,<br>\nThe Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        512
+      ],
+      "id": "15692232-133e-406a-8e4b-299bac3e33e7",
+      "name": "Send a message1",
+      "webhookId": "34fb43f2-3b3d-4e3f-90eb-753cfd086781",
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "wCVxYni9ciC08AGe",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\":\"success\",\"message\":\"Thanks! We'll be in touch.\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        816,
+        416
+      ],
+      "id": "70c1c548-98b3-4391-b9b2-2a25ed51f5d3",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b8f38772-2d6a-4184-8a4c-ab6915445a98",
+              "leftValue": "={{$json.body.email}}",
+              "rightValue": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -16,
+        32
+      ],
+      "id": "f8076efd-08c6-4655-a238-35c02d5780e0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\":\"error\",\"message\":\"Please provide a valid email.\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        288
+      ],
+      "id": "de36e40b-927d-417c-9043-6761f9415906",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/analyze-lead",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $json.body.name }}\",\n  \"phone\": \"{{ $json.body.phone }}\",\n  \"email\": \"{{ $json.body.email }}\",\n  \"source\": \"website\",\n  \"message\": \"{{ $json.body.message }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        16
+      ],
+      "id": "7e3adfde-464c-4e01-9b37-3a3baaa22414",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.urgency_score }}",
+                    "rightValue": 8,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    },
+                    "id": "1d842964-4e96-4593-bd86-f3dcdc067ec3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8243f781-f811-43d9-95a3-95bdb6b99e1a",
+                    "leftValue": "={{ $json.urgency_score }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "29e4743e-7ac4-4eb1-b991-f09d4759948f",
+                    "leftValue": "={{ $json.urgency_score }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cold"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        240
+      ],
+      "id": "32562607-d8e0-4135-86e8-dd896d5b2ada",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "4149c4f8-c664-47dd-9be5-e12ac84a613d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "edcc20b97ed213c9f70bc26db0045b8296b719fc395e78234c47f16f649134ba"
+  },
+  "nodeGroups": [],
+  "id": "iPOYsxQILYgZhWE3",
+  "tags": []
+}
